@@ -316,6 +316,30 @@
     .toast.success .toast-icon { color: #22c55e; }
     .toast.error .toast-icon { color: #ef4444; }
     
+    /* SKELETON LOADING */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card2) 50%, var(--bg-card) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 24px; display: flex; flex-direction: column;
+    }
+    .skeleton-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .skeleton-tag { width: 60px; height: 24px; }
+    .skeleton-title { width: 80%; height: 24px; margin-bottom: 12px; }
+    .skeleton-summary { width: 100%; height: 16px; margin-bottom: 8px; }
+    .skeleton-summary-2 { width: 90%; height: 16px; margin-bottom: 16px; }
+    .skeleton-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid var(--border); }
+    .skeleton-source { width: 100px; height: 16px; }
+    .skeleton-more { width: 80px; height: 16px; }
+    
     /* RESPONSIVE */
     @media (max-width: 768px) {
       .hero-title { font-size: 36px; }
@@ -562,6 +586,9 @@
         try {
           console.log('🔄 开始从数据库加载资讯...');
           
+          // 先显示骨架屏
+          renderSkeleton();
+          
           if (!supabase) {
             throw new Error('Supabase 未初始化');
           }
@@ -625,6 +652,28 @@
         return date.toLocaleDateString('zh-CN');
       }
       
+      // 渲染骨架屏
+      function renderSkeleton() {
+        const grid = document.getElementById('newsGrid');
+        const skeletonHTML = Array(6).fill(`
+          <div class="skeleton-card">
+            <div class="skeleton-meta">
+              <div class="skeleton skeleton-tag"></div>
+              <div class="skeleton skeleton-tag" style="width: 80px;"></div>
+            </div>
+            <div class="skeleton skeleton-title"></div>
+            <div class="skeleton skeleton-summary"></div>
+            <div class="skeleton skeleton-summary-2"></div>
+            <div class="skeleton-footer">
+              <div class="skeleton skeleton-source"></div>
+              <div class="skeleton skeleton-more"></div>
+            </div>
+          </div>
+        `).join('');
+        
+        grid.innerHTML = skeletonHTML;
+      }
+      
       // 渲染资讯卡片
       function renderNewsCards(data) {
         const grid = document.getElementById('newsGrid');
@@ -671,12 +720,18 @@
       
       // 筛选资讯
       function filterNews(category) {
-        if (category === 'all') {
-          renderNewsCards(newsData);
-        } else {
-          const filtered = newsData.filter(item => item.category === category);
-          renderNewsCards(filtered);
-        }
+        // 显示骨架屏
+        renderSkeleton();
+        
+        // 延迟一小段时间，让骨架屏先显示（模拟加载体验）
+        setTimeout(function() {
+          if (category === 'all') {
+            renderNewsCards(newsData);
+          } else {
+            const filtered = newsData.filter(item => item.category === category);
+            renderNewsCards(filtered);
+          }
+        }, 300);
       }
       
       // ===== 文章详情功能 =====
