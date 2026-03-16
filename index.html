@@ -686,12 +686,13 @@
         
         if (article.url && article.url !== '#') {
           articleLink.href = article.url;
+          articleLink.innerHTML = '<span>阅读原文</span><span>↗</span>';
           articleLinkContainer.style.display = 'block';
         } else {
           // 如果没有 url，生成一个搜索链接
           const searchUrl = 'https://www.google.com/search?q=' + encodeURIComponent(article.title);
           articleLink.href = searchUrl;
-          articleLink.innerHTML = '<span>在 Google 搜索</span><span>↗</span>';
+          articleLink.innerHTML = '<span>在 Google 搜索</span><span>🔍</span>';
           articleLinkContainer.style.display = 'block';
         }
         
@@ -702,6 +703,9 @@
       
       function generateArticleContent(article) {
         // 生成完整的文章内容
+        const hasUrl = article.url && article.url !== '#';
+        const linkText = hasUrl ? '点击下方"阅读原文"链接查看完整内容。' : '点击下方按钮在 Google 搜索更多相关信息。';
+        
         return `
           <p><strong>${article.summary}</strong></p>
           <p>这是一篇关于${article.categoryName}的资讯文章。以下是详细内容：</p>
@@ -713,7 +717,7 @@
             <li>市场影响：${article.source}</li>
             <li>未来趋势：${article.categoryName}领域将持续发展</li>
           </ul>
-          <p>想了解更多详情，请点击下方"阅读原文"链接查看完整内容。</p>
+          <p>想了解更多详情，请${linkText}</p>
         `;
       }
       
