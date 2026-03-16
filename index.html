@@ -323,7 +323,24 @@
       .hero-form { flex-direction: column; }
       .hero-stats { gap: 20px; }
       .stat-num { font-size: 24px; }
-      .nav-links { display: none; }
+      .nav-links {
+        display: none;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--border);
+        padding: 20px;
+        flex-direction: column;
+        gap: 16px;
+        box-shadow: var(--shadow);
+        z-index: 99;
+      }
+      .nav-links.show { display: flex; }
+      .nav-links a { font-size: 16px; padding: 12px 0; }
+      .search-btn { width: 100%; justify-content: flex-start; }
+      .btn-nav { width: 100%; text-align: center; }
       .hamburger { display: block; }
       .features-grid { grid-template-columns: 1fr; }
       .news-grid { grid-template-columns: 1fr; }
@@ -879,6 +896,32 @@
       const subscribeBtn2 = document.getElementById('subscribeButton');
       if (subscribeBtn1) subscribeBtn1.addEventListener('click', handleSubscribe);
       if (subscribeBtn2) subscribeBtn2.addEventListener('click', handleSubscribe);
+      
+      // ===== 移动端菜单 =====
+      const hamburger = document.getElementById('hamburger');
+      const navLinks = document.querySelector('.nav-links');
+      
+      hamburger.addEventListener('click', function() {
+        navLinks.classList.toggle('show');
+        hamburger.textContent = navLinks.classList.contains('show') ? '✕' : '☰';
+      });
+      
+      // 点击导航链接后关闭菜单
+      document.querySelectorAll('.nav-links a').forEach(function(link) {
+        link.addEventListener('click', function() {
+          navLinks.classList.remove('show');
+          hamburger.textContent = '☰';
+        });
+      });
+      
+      // 点击搜索按钮后关闭菜单
+      const searchBtn = document.getElementById('searchBtn');
+      if (searchBtn) {
+        searchBtn.addEventListener('click', function() {
+          navLinks.classList.remove('show');
+          hamburger.textContent = '☰';
+        });
+      }
       
       // ===== 页面加载 =====
       window.addEventListener('load', function() {
