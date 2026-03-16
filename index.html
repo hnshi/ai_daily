@@ -322,11 +322,6 @@
         ChatGPT、Gemini、Claude、Sora……AI世界每天都在发生大事。<br/>
         我们替你扫描全球资讯，浓缩成你每天必读的精华日报。
       </p>
-      <div class="hero-form">
-        <input type="email" placeholder="输入你的邮箱，免费订阅AI日报" class="email-input" id="heroEmail"/>
-        <button class="btn-primary" id="subscribeBtn">免费订阅 →</button>
-      </div>
-      <p class="hero-hint">已有 <strong>12,847</strong> 位AI爱好者订阅 · 随时可退订</p>
       <div class="hero-stats">
         <div class="stat"><span class="stat-num">50+</span><span class="stat-label">资讯来源</span></div>
         <div class="stat-divider"></div>
@@ -340,6 +335,33 @@
     <div class="hero-scroll">
       <span>向下滚动</span>
       <div class="scroll-arrow">↓</div>
+    </div>
+  </section>
+
+  <!-- NEWS -->
+  <section class="news-section" id="news">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">今日精选</div>
+        <h2 class="section-title">最新AI资讯</h2>
+        <p class="section-desc">从数据库加载的真实数据</p>
+      </div>
+
+      <div class="news-categories">
+        <button class="cat-btn active" data-filter="all">全部</button>
+        <button class="cat-btn" data-filter="model">大模型</button>
+        <button class="cat-btn" data-filter="tool">AI工具</button>
+        <button class="cat-btn" data-filter="solo">AI一人项目</button>
+        <button class="cat-btn" data-filter="funding">融资动态</button>
+        <button class="cat-btn" data-filter="research">学术前沿</button>
+      </div>
+
+      <div class="news-grid" id="newsGrid">
+        <div style="text-align: center; padding: 60px; grid-column: 1/-1;">
+          <div style="font-size: 40px; margin-bottom: 20px;">🔄</div>
+          <p style="color: var(--text-muted);">正在从数据库加载资讯...</p>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -387,29 +409,20 @@
     </div>
   </section>
 
-  <!-- NEWS -->
-  <section class="news-section" id="news">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-tag">今日精选</div>
-        <h2 class="section-title">最新AI资讯</h2>
-        <p class="section-desc">从数据库加载的真实数据</p>
+  <!-- SUBSCRIBE -->
+  <section class="subscribe-section" id="subscribe" style="background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(6,182,212,0.1)); padding: 100px 0;">
+    <div class="container" style="text-align: center;">
+      <div class="section-header" style="text-align: center;">
+        <div class="section-tag">📬 免费订阅</div>
+        <h2 class="section-title">不错过任何AI动态</h2>
+        <p class="section-desc">每天早上8点，一封精心整理的AI日报准时送达你的邮箱</p>
       </div>
-
-      <div class="news-categories">
-        <button class="cat-btn active" data-filter="all">全部</button>
-        <button class="cat-btn" data-filter="model">大模型</button>
-        <button class="cat-btn" data-filter="tool">AI工具</button>
-        <button class="cat-btn" data-filter="solo">AI一人项目</button>
-        <button class="cat-btn" data-filter="funding">融资动态</button>
-        <button class="cat-btn" data-filter="research">学术前沿</button>
-      </div>
-
-      <div class="news-grid" id="newsGrid">
-        <div style="text-align: center; padding: 60px; grid-column: 1/-1;">
-          <div style="font-size: 40px; margin-bottom: 20px;">🔄</div>
-          <p style="color: var(--text-muted);">正在从数据库加载资讯...</p>
+      <div style="max-width: 600px; margin: 0 auto;">
+        <div class="hero-form">
+          <input type="email" placeholder="输入你的邮箱，免费订阅AI日报" class="email-input" id="subscribeEmail"/>
+          <button class="btn-primary" id="subscribeButton">免费订阅 →</button>
         </div>
+        <p class="hero-hint">已有 <strong>12,847</strong> 位AI爱好者订阅 · 随时可退订</p>
       </div>
     </div>
   </section>
@@ -635,7 +648,16 @@
       
       // ===== 订阅功能 =====
       function handleSubscribe() {
-        const emailInput = document.getElementById('heroEmail');
+        // 支持多个邮箱输入框
+        const emailInput1 = document.getElementById('heroEmail');
+        const emailInput2 = document.getElementById('subscribeEmail');
+        const emailInput = emailInput2 || emailInput1; // 优先使用新的
+        
+        if (!emailInput) {
+          showToast('未找到邮箱输入框', 'error');
+          return;
+        }
+        
         const email = emailInput.value.trim();
         
         if (!email) {
@@ -700,7 +722,11 @@
       });
       
       // ===== 订阅按钮事件 =====
-      document.getElementById('subscribeBtn').addEventListener('click', handleSubscribe);
+      // 绑定订阅按钮事件（两个ID都支持）
+      const subscribeBtn1 = document.getElementById('subscribeBtn');
+      const subscribeBtn2 = document.getElementById('subscribeButton');
+      if (subscribeBtn1) subscribeBtn1.addEventListener('click', handleSubscribe);
+      if (subscribeBtn2) subscribeBtn2.addEventListener('click', handleSubscribe);
       
       // ===== 页面加载 =====
       window.addEventListener('load', function() {
