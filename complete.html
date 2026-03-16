@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI日氪 · 全球AI资讯每日精选</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <style>
+    /* ========================================
+       AI日氪 · 全局样式
+       ======================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary: #7c3aed;
+      --primary-light: #a855f7;
+      --primary-dark: #5b21b6;
+      --accent: #06b6d4;
+      --accent2: #f59e0b;
+      --bg: #0a0a0f;
+      --bg-card: #12121a;
+      --bg-card2: #1a1a26;
+      --border: rgba(255,255,255,0.08);
+      --border-light: rgba(255,255,255,0.15);
+      --text: #f0f0f5;
+      --text-muted: #9090aa;
+      --text-dim: #5a5a78;
+      --gradient: linear-gradient(135deg, #7c3aed, #06b6d4);
+      --gradient2: linear-gradient(135deg, #f59e0b, #ef4444);
+      --radius: 16px;
+      --radius-sm: 8px;
+      --shadow: 0 20px 60px rgba(0,0,0,0.4);
+      --shadow-glow: 0 0 40px rgba(124,58,237,0.3);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+
+    /* ===== NAV ===== */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 0;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+
+    .nav.scrolled {
+      padding: 12px 0;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.4);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo-icon {
+      font-size: 24px;
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: 8px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .search-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .search-btn:hover {
+      background: var(--bg-card2);
+      border-color: var(--primary);
+      color: var(--text);
+    }
+
+    .search-btn .kbd {
+      background: var(--bg-card2);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: monospace;
+    }
+
+    .btn-nav {
+      background: var(--gradient);
+      color: white;
+      padding: 10px 24px;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-nav:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0 80px;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(124,58,237,0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 50%, rgba(6,182,212,0.15) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .grid-lines {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(circle, black 30%, transparent 70%);
+    }
+
+    .glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+      opacity: 0.3;
+      filter: blur(80px);
+      animation: glow 8s ease-in-out infinite;
+    }
+
+    .glow-1 { top: -200px; left: -200px; }
+    .glow-2 { bottom: -200px; right: -200px; animation-delay: 4s; }
+
+    @keyframes glow {
+      0%, 100% { transform: scale(1); opacity: 0.3; }
+      50% { transform: scale(1.2); opacity: 0.4; }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 20px;
+      background: var(--bg-card2);
+      border: 1px solid var(--border-light);
+      border-radius: 50px;
+      font-size: 14px;
+      color: var(--primary-light);
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 24px;
+    }
+
+    .gradient-text {
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 18px;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      max-width: 600px;
+    }
+
+    .hero-form {
+      display: flex;
+      gap: 12px;
+      max-width: 500px;
+      margin-bottom: 16px;
+    }
+
+    .email-input {
+      flex: 1;
+      padding: 14px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .email-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(124,58,237,0.3);
+    }
+
+    .btn-primary {
+      padding: 14px 32px;
+      background: var(--gradient);
+      border: none;
+      border-radius: 50px;
+      color: white;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .hero-hint {
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 60px;
+      padding-top: 40px;
+      border-top: 1px solid var(--border);
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      display: block;
+      font-size: 32px;
+      font-weight: 700;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .stat-divider {
+      width: 1px;
+      background: var(--border);
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 12px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translate(-50%, 0); }
+      50% { transform: translate(-50%, 10px); }
+    }
+
+    .scroll-arrow {
+      font-size: 20px;
+      margin-top: 8px;
+    }
+
+    /* ===== SECTIONS ===== */
+    section {
+      padding: 100px 0;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .section-tag {
+      display: inline-block;
+      padding: 6px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      font-size: 13px;
+      color: var(--primary-light);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 42px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .section-desc {
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+
+    /* ===== FEATURES ===== */
+    .features {
+      background: var(--bg-card);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      position: relative;
+      padding: 32px;
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: all 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: var(--shadow);
+    }
+
+    .feature-card.featured {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(6,182,212,0.1));
+    }
+
+    .feature-badge {
+      position: absolute;
+      top: -10px;
+      right: 20px;
+      padding: 4px 12px;
+      background: var(--gradient);
+      border-radius: 50px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .feature-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    .feature-card h3 {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ===== NEWS ===== */
+    .news-section {
+      background: var(--bg);
+    }
+
+    .news-categories {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .cat-btn {
+      padding: 10px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+
+    .cat-btn:hover {
+      background: var(--bg-card2);
+      border-color: var(--primary-light);
+    }
+
+    .cat-btn.active {
+      background: var(--gradient);
+      border-color: transparent;
+      color: white;
+    }
+
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
+    }
+
+    .news-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .news-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: var(--shadow);
+    }
+
+    .news-card.hot {
+      border-color: var(--accent2);
+      background: linear-gradient(135deg, rgba(245,158,11,0.1), var(--bg-card));
+    }
+
+    .news-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .news-tag {
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .news-tag.tag-model { background: rgba(124,58,237,0.2); color: #a855f7; }
+    .news-tag.tag-tool { background: rgba(6,182,212,0.2); color: #22d3ee; }
+    .news-tag.tag-solo { background: rgba(245,158,11,0.2); color: #fbbf24; }
+    .news-tag.tag-funding { background: rgba(239,68,68,0.2); color: #f87171; }
+    .news-tag.tag-research { background: rgba(34,197,94,0.2); color: #4ade80; }
+
+    .news-hot {
+      background: var(--gradient2);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .news-time {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-left: auto;
+    }
+
+    .news-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .news-summary {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 16px;
+      flex: 1;
+    }
+
+    .news-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .news-source {
+      color: var(--text-dim);
+    }
+
+    .news-readmore {
+      color: var(--primary-light);
+      font-weight: 600;
+    }
+
+    /* ===== SEARCH MODAL ===== */
+    .search-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 150px;
+      z-index: 1000;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .search-modal.show {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .search-modal-content {
+      width: 600px;
+      max-width: 90%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .search-modal-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .search-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .search-input-wrapper span {
+      font-size: 24px;
+    }
+
+    .search-modal-input {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 18px;
+      outline: none;
+    }
+
+    .search-modal-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .search-modal-results {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .search-result-item {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .search-result-item:hover {
+      background: var(--bg-card2);
+    }
+
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+
+    .search-result-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .search-result-meta {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow);
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast-icon {
+      font-size: 20px;
+    }
+
+    .toast-content {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .toast.success .toast-icon { color: #22c55e; }
+    .toast.error .toast-icon { color: #ef4444; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .hero-title { font-size: 36px; }
+      .hero-desc { font-size: 16px; }
+      .hero-form { flex-direction: column; }
+      .hero-stats { gap: 20px; }
+      .stat-num { font-size: 24px; }
+      .nav-links { display: none; }
+      .hamburger { display: block; }
+      .features-grid { grid-template-columns: 1fr; }
+      .news-grid { grid-template-columns: 1fr; }
+      .search-modal-content { width: 90%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAV ===== -->
+  <header class="nav">
+    <div class="nav-inner container">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">AI日氪</span>
+        <span class="logo-sub">Daily AI Digest</span>
+      </div>
+      <nav class="nav-links">
+        <button class="search-btn" id="searchBtn" title="搜索（Ctrl+K）">
+          <span>🔍</span>
+          <span>搜索</span>
+          <span class="kbd">Ctrl K</span>
+        </button>
+        <a href="#features">功能</a>
+        <a href="#news">最新资讯</a>
+        <a href="#subscribe" class="btn-nav">免费订阅</a>
+      </nav>
+      <button class="hamburger" id="hamburger">☰</button>
+    </div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="grid-lines"></div>
+      <div class="glow glow-1"></div>
+      <div class="glow glow-2"></div>
+    </div>
+    <div class="container hero-content">
+      <div class="badge">🔥 每日更新 · 精选全球50+资讯源</div>
+      <h1 class="hero-title">
+        全球AI资讯<br/>
+        <span class="gradient-text">每天5分钟，掌握AI世界</span>
+      </h1>
+      <p class="hero-desc">
+        ChatGPT、Gemini、Claude、Sora……AI世界每天都在发生大事。<br/>
+        我们替你扫描全球资讯，浓缩成你每天必读的精华日报。
+      </p>
+      <div class="hero-form">
+        <input type="email" placeholder="输入你的邮箱，免费订阅AI日报" class="email-input" id="heroEmail"/>
+        <button class="btn-primary" onclick="handleSubscribe('heroEmail')">免费订阅 →</button>
+      </div>
+      <p class="hero-hint">已有 <strong>12,847</strong> 位AI爱好者订阅 · 随时可退订</p>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">50+</span><span class="stat-label">资讯来源</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">日更</span><span class="stat-label">从不断更</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">中文</span><span class="stat-label">翻译精读</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">免费</span><span class="stat-label">基础版永久</span></div>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <span>向下滚动</span>
+      <div class="scroll-arrow">↓</div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES ===== -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">为什么选择 AI日氪</div>
+        <h2 class="section-title">你真正需要的AI资讯体验</h2>
+        <p class="section-desc">我们不是信息搬运工，我们是你的AI世界向导</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🌐</div>
+          <h3>全球资讯聚合</h3>
+          <p>同步抓取 TechCrunch、The Verge、MIT Tech Review、36氪等50余个顶级媒体，不遗漏任何重要动态。</p>
+        </div>
+        <div class="feature-card featured">
+          <div class="feature-badge">最受欢迎</div>
+          <div class="feature-icon">🤖</div>
+          <h3>AI智能摘要</h3>
+          <p>每条资讯经过AI二次处理，提炼核心观点，去除废话，让你30秒看完一篇文章的精华。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>趋势热度排行</h3>
+          <p>实时监测哪些AI话题最火热，帮你把握行业风向，不被信息浪潮淹没。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🏷️</div>
+          <h3>精准分类标签</h3>
+          <p>大模型、AI工具、融资动态、学术论文……按你的兴趣定制资讯流，只看你想看的。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📬</div>
+          <h3>每日邮件日报</h3>
+          <p>每天早上8点，一封精心整理的AI日报准时送达你的邮箱，开启充实的一天。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔔</div>
+          <h3>重大事件即时提醒</h3>
+          <p>OpenAI发布会、大模型版本更新、行业重磅融资……第一时间推送，不错过任何大事。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== NEWS ===== -->
+  <section class="news-section" id="news">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">今日精选</div>
+        <h2 class="section-title">最新AI资讯</h2>
+        <p class="section-desc">从数据库加载的真实数据</p>
+      </div>
+
+      <div class="news-categories">
+        <button class="cat-btn active" onclick="filterNews('all', this)">全部</button>
+        <button class="cat-btn" onclick="filterNews('model', this)">大模型</button>
+        <button class="cat-btn" onclick="filterNews('tool', this)">AI工具</button>
+        <button class="cat-btn" onclick="filterNews('solo', this)">AI一人项目</button>
+        <button class="cat-btn" onclick="filterNews('funding', this)">融资动态</button>
+        <button class="cat-btn" onclick="filterNews('research', this)">学术前沿</button>
+      </div>
+
+      <div class="news-grid" id="newsGrid">
+        <div style="text-align: center; padding: 60px; grid-column: 1/-1;">
+          <div style="font-size: 40px; margin-bottom: 20px;">🔄</div>
+          <p style="color: var(--text-muted);">正在从数据库加载资讯...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SEARCH MODAL ===== -->
+  <div class="search-modal" id="searchModal">
+    <div class="search-modal-content">
+      <div class="search-modal-header">
+        <div class="search-input-wrapper">
+          <span>🔍</span>
+          <input type="text" class="search-modal-input" id="searchInput" placeholder="搜索资讯...（支持关键词）" autocomplete="off">
+        </div>
+      </div>
+      <div class="search-modal-results" id="searchResults"></div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div class="toast" id="toast">
+    <span class="toast-icon">✅</span>
+    <span class="toast-content">操作成功</span>
+  </div>
+
+  <script>
+    // ===== Supabase 配置 =====
+    const SUPABASE_URL = 'https://pkveggrcoftgxvxtkbnj.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBrdmVnZ3Jjb2Z0Z3h2eHRrYm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NDI0NTksImV4cCI6MjA4OTIxODQ1OX0.mo8px2ta-qIBIPFG6x2YLV0LNnqJUxLppHhjRidCLKs';
+    
+    // 初始化 Supabase
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    // 全局数据
+    let newsData = [];
+    
+    // ===== 从数据库加载资讯 =====
+    async function loadNewsFromDB() {
+      try {
+        console.log('🔄 开始从数据库加载资讯...');
+        
+        const { data, error } = await supabase
+          .from('articles')
+          .select('*')
+          .order('published_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        // 转换数据格式
+        newsData = data.map(item => ({
+          id: item.id,
+          title: item.title,
+          summary: item.summary,
+          category: item.category,
+          categoryName: getCategoryName(item.category),
+          source: item.source,
+          time: formatTimeAgo(item.published_at),
+          url: item.url || `#article-${item.id}`
+        }));
+        
+        console.log(`✅ 已加载 ${newsData.length} 条资讯`);
+        renderNewsCards(newsData);
+      } catch (error) {
+        console.error('❌ 加载资讯失败:', error);
+        showToast('加载资讯失败，请刷新页面重试', 'error');
+      }
+    }
+    
+    // 获取分类中文名
+    function getCategoryName(category) {
+      const map = {
+        model: '大模型',
+        tool: 'AI工具',
+        solo: 'AI一人项目',
+        funding: '融资动态',
+        research: '学术前沿'
+      };
+      return map[category] || category;
+    }
+    
+    // 格式化时间
+    function formatTimeAgo(dateStr) {
+      const now = new Date();
+      const date = new Date(dateStr);
+      const diffMs = now - date;
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffDays = Math.floor(diffHours / 24);
+      
+      if (diffHours < 1) return '刚刚';
+      if (diffHours < 24) return `${diffHours}小时前`;
+      if (diffDays < 7) return `${diffDays}天前`;
+      return date.toLocaleDateString('zh-CN');
+    }
+    
+    // 渲染资讯卡片
+    function renderNewsCards(data) {
+      const grid = document.getElementById('newsGrid');
+      
+      if (!data || data.length === 0) {
+        grid.innerHTML = `
+          <div style="text-align: center; padding: 60px; grid-column: 1/-1;">
+            <div style="font-size: 40px; margin-bottom: 20px;">📭</div>
+            <p style="color: var(--text-muted);">暂无资讯数据</p>
+          </div>
+        `;
+        return;
+      }
+      
+      grid.innerHTML = '';
+      
+      data.forEach((item, index) => {
+        const isHot = index === 0;
+        const hotBadge = isHot ? '<span class="news-hot">🔥 今日最热</span>' : '';
+        
+        const card = document.createElement('article');
+        card.className = `news-card ${isHot ? 'hot' : ''}`;
+        card.dataset.cat = item.category;
+        card.dataset.id = item.id;
+        card.onclick = () => openArticle(item.id);
+        
+        card.innerHTML = `
+          <div class="news-meta">
+            <span class="news-tag tag-${item.category}">${item.categoryName}</span>
+            ${hotBadge}
+            <span class="news-time">${item.time}</span>
+          </div>
+          <h3 class="news-title">${item.title}</h3>
+          <p class="news-summary">${item.summary}</p>
+          <div class="news-footer">
+            <span class="news-source">📰 ${item.source}</span>
+            <span class="news-readmore">阅读全文 →</span>
+          </div>
+        `;
+        
+        grid.appendChild(card);
+      });
+    }
+    
+    // 筛选资讯
+    function filterNews(category, btn) {
+      // 更新按钮状态
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // 筛选数据
+      if (category === 'all') {
+        renderNewsCards(newsData);
+      } else {
+        const filtered = newsData.filter(item => item.category === category);
+        renderNewsCards(filtered);
+      }
+    }
+    
+    // 打开文章详情
+    function openArticle(id) {
+      showToast('文章详情功能开发中...', 'info');
+    }
+    
+    // ===== 搜索功能 =====
+    const searchModal = document.getElementById('searchModal');
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+    
+    function openSearch() {
+      searchModal.classList.add('show');
+      searchInput.focus();
+    }
+    
+    function closeSearch() {
+      searchModal.classList.remove('show');
+      searchInput.value = '';
+      searchResults.innerHTML = '';
+    }
+    
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      
+      if (query.length < 2) {
+        searchResults.innerHTML = '';
+        return;
+      }
+      
+      const results = newsData.filter(item => 
+        item.title.toLowerCase().includes(query) || 
+        item.summary.toLowerCase().includes(query)
+      );
+      
+      if (results.length === 0) {
+        searchResults.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-dim);">未找到相关资讯</div>';
+        return;
+      }
+      
+      searchResults.innerHTML = results.map(item => `
+        <div class="search-result-item" onclick="openArticle(${item.id}); closeSearch();">
+          <div class="search-result-title">${item.title}</div>
+          <div class="search-result-meta">${item.categoryName} · ${item.time}</div>
+        </div>
+      `).join('');
+    });
+    
+    // 点击遮罩层关闭搜索
+    searchModal.addEventListener('click', (e) => {
+      if (e.target === searchModal) closeSearch();
+    });
+    
+    // ESC 关闭搜索
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeSearch();
+      if (e.ctrlKey && e.key === 'k') {
+        e.preventDefault();
+        openSearch();
+      }
+    });
+    
+    // 搜索按钮点击
+    document.getElementById('searchBtn').addEventListener('click', openSearch);
+    
+    // ===== 订阅功能 =====
+    function handleSubscribe(inputId) {
+      const emailInput = document.getElementById(inputId);
+      const email = emailInput.value.trim();
+      
+      if (!email) {
+        showToast('请输入邮箱地址', 'error');
+        return;
+      }
+      
+      if (!email.includes('@')) {
+        showToast('请输入有效的邮箱地址', 'error');
+        return;
+      }
+      
+      // 模拟订阅成功
+      showToast('订阅成功！请查收确认邮件', 'success');
+      emailInput.value = '';
+      
+      // 写入数据库（可选）
+      subscribeToDatabase(email);
+    }
+    
+    async function subscribeToDatabase(email) {
+      try {
+        const { error } = await supabase
+          .from('subscriptions')
+          .insert([{ email }]);
+        
+        if (error) {
+          console.error('订阅数据库写入失败:', error);
+        } else {
+          console.log('✅ 邮箱已写入数据库');
+        }
+      } catch (err) {
+        console.error('订阅异常:', err);
+      }
+    }
+    
+    // ===== Toast 提示 =====
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+      
+      toast.querySelector('.toast-icon').textContent = icon;
+      toast.querySelector('.toast-content').textContent = message;
+      toast.className = `toast ${type} show`;
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+    
+    // ===== NAV 滚动效果 =====
+    const nav = document.querySelector('.nav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    });
+    
+    // ===== 页面加载 =====
+    window.addEventListener('load', () => {
+      console.log('🚀 页面加载完成');
+      loadNewsFromDB();
+    });
+  </script>
+</body>
+</html>
