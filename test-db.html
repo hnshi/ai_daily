@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据库连接测试 - AI日氪</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 { color: #333; margin-bottom: 20px; }
+    .status {
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-weight: bold;
+    }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+    .loading { background: #fff3cd; color: #856404; }
+    .news-item {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 6px;
+    }
+    .news-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .tag-model { background: #a78bfa; color: white; }
+    .tag-tool { background: #38bdf8; color: white; }
+    .tag-solo { background: #f472b6; color: white; }
+    .tag-funding { background: #fbbf24; color: white; }
+    .tag-research { background: #34d399; color: white; }
+    pre { background: #f8f8f8; padding: 10px; border-radius: 6px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔍 Supabase 数据库连接测试</h1>
+
+    <div id="status" class="status loading">正在连接数据库...</div>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://pkveggrcoftgxvxtkbnj.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBrdmVnZ3Jjb2Z0Z3h2eHRrYm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NDI0NTksImV4cCI6MjA4OTIxODQ1OX0.mo8px2ta-qIBIPFG6x2YLV0LNnqJUxLppHhjRidCLKs';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function testConnection() {
+      const statusEl = document.getElementById('status');
+      const resultEl = document.getElementById('result');
+
+      try {
+        console.log('开始测试数据库连接...');
+        console.log('URL:', SUPABASE_URL);
+        console.log('Key:', SUPABASE_KEY.substring(0, 20) + '...');
+
+        // 测试查询
+        const { data, error } = await supabase
+          .from('articles')
+          .select('*')
+          .limit(10);
+
+        if (error) {
+          throw error;
+        }
+
+        console.log('查询成功！', data);
+
+        // 显示成功状态
+        statusEl.className = 'status success';
+        statusEl.textContent = `✅ 连接成功！共获取到 ${data.length} 条资讯`;
+
+        // 显示数据
+        resultEl.innerHTML = `
+          <h3>📰 数据预览：</h3>
+          ${data.map(item => `
+            <div class="news-item">
+              <span class="news-tag tag-${item.category}">${item.category}</span>
+              <h4>${item.title}</h4>
+              <p>${item.summary}</p>
+              <small>来源：${item.source} | 时间：${new Date(item.published_at).toLocaleString('zh-CN')}</small>
+            </div>
+          `).join('')}
+          <h3>🔧 配置信息：</h3>
+          <pre>${JSON.stringify({
+            url: SUPABASE_URL,
+            keyPreview: SUPABASE_KEY.substring(0, 30) + '...',
+            count: data.length
+          }, null, 2)}</pre>
+        `;
+
+      } catch (error) {
+        console.error('连接失败:', error);
+        statusEl.className = 'status error';
+        statusEl.textContent = '❌ 连接失败';
+        resultEl.innerHTML = `
+          <h3>错误详情：</h3>
+          <pre>${error.message}</pre>
+          <p><strong>可能的原因：</strong></p>
+          <ul>
+            <li>API Key 格式不正确</li>
+            <li>Supabase 项目 URL 不正确</li>
+            <li>数据库表尚未创建或没有数据</li>
+            <li>网络连接问题</li>
+          </ul>
+        `;
+      }
+    }
+
+    // 页面加载时自动测试
+    testConnection();
+  </script>
+</body>
+</html>

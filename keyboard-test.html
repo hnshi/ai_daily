@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>快捷键测试页面</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #0a0a0f;
+      color: #f0f0f5;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+    h1 { margin-bottom: 20px; }
+    .test-box {
+      background: #12121a;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .log {
+      background: #1a1a26;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 14px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .log div {
+      margin: 5px 0;
+      padding: 5px 10px;
+      border-left: 3px solid #7c3aed;
+    }
+    .info { border-left-color: #3b82f6; color: #3b82f6; }
+    .success { border-left-color: #22c55e; color: #22c55e; }
+    .error { border-left-color: #ef4444; color: #ef4444; }
+    .warning { border-left-color: #f59e0b; color: #f59e0b; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⌨️ 快捷键测试页面</h1>
+    
+    <div class="test-box">
+      <h2>测试说明</h2>
+      <p>请按下 <strong>Ctrl + K</strong> 快捷键</p>
+      <p>如果功能正常，会显示弹窗并在下方日志中记录</p>
+    </div>
+    
+    <div class="test-box">
+      <h2>快捷键事件监听</h2>
+      <div id="log" class="log">
+        <div class="info">等待按键...</div>
+      </div>
+    </div>
+    
+    <div class="test-box">
+      <h2>其他测试</h2>
+      <button onclick="testAlert()">测试 Alert</button>
+      <button onclick="testFocus()">测试焦点</button>
+    </div>
+  </div>
+
+  <script>
+    const log = document.getElementById('log');
+    
+    function addLog(message, type = 'info') {
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = type;
+      div.textContent = `[${time}] ${message}`;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+    
+    // 方法1：使用 keydown 事件
+    document.addEventListener('keydown', (e) => {
+      addLog(`keydown 事件: key="${e.key}", code="${e.code}", ctrlKey=${e.ctrlKey}, metaKey=${e.metaKey}`, 'info');
+      
+      // 检测 Ctrl+K
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        addLog('✅ 检测到 Ctrl+K 快捷键！', 'success');
+        alert('🎯 Ctrl+K 快捷键已触发！');
+      }
+      
+      // 检测 Ctrl+Shift+K
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'K') {
+        e.preventDefault();
+        addLog('✅ 检测到 Ctrl+Shift+K 快捷键！', 'success');
+      }
+    });
+    
+    // 方法2：使用 keyup 事件
+    document.addEventListener('keyup', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        addLog('keyup 事件: Ctrl+K', 'warning');
+      }
+    });
+    
+    // 方法3：使用 keypress 事件
+    document.addEventListener('keypress', (e) => {
+      addLog(`keypress 事件: key="${e.key}", which=${e.which}`, 'warning');
+    });
+    
+    function testAlert() {
+      addLog('测试 Alert 按钮', 'info');
+      alert('Alert 功能正常！');
+    }
+    
+    function testFocus() {
+      addLog('设置焦点到 body', 'info');
+      document.body.focus();
+    }
+    
+    // 页面加载
+    window.addEventListener('load', () => {
+      addLog('页面加载完成', 'success');
+      addLog('快捷键监听器已注册', 'success');
+    });
+    
+    // 点击页面任意位置记录
+    document.addEventListener('click', (e) => {
+      addLog(`点击: ${e.target.tagName} (id: ${e.target.id})`, 'info');
+    });
+  </script>
+</body>
+</html>

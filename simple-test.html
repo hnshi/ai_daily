@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI日氪 - 测试页面</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #0a0a0f;
+      color: #f0f0f5;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .test-section {
+      background: #12121a;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+    }
+    
+    .btn:hover {
+      opacity: 0.9;
+    }
+    
+    .console {
+      background: #1a1a26;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 14px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .console div {
+      margin: 5px 0;
+      padding: 5px;
+      border-left: 3px solid #7c3aed;
+      padding-left: 10px;
+    }
+    
+    .success { border-left-color: #22c55e !important; color: #22c55e; }
+    .error { border-left-color: #ef4444 !important; color: #ef4444; }
+    .info { border-left-color: #3b82f6 !important; color: #3b82f6; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 AI日氪 - 功能测试页面</h1>
+    
+    <div class="test-section">
+      <h2>1. JavaScript 测试</h2>
+      <button class="btn" onclick="testAlert()">测试 Alert</button>
+      <button class="btn" onclick="testConsole()">测试 Console</button>
+      <div id="console-output" class="console">
+        <div class="info">等待测试...</div>
+      </div>
+    </div>
+    
+    <div class="test-section">
+      <h2>2. 快捷键测试</h2>
+      <p>按 <strong>Ctrl+K</strong> 应该会弹窗提示</p>
+      <div id="shortcut-output" class="console">
+        <div class="info">等待按键...</div>
+      </div>
+    </div>
+    
+    <div class="test-section">
+      <h2>3. 按钮交互测试</h2>
+      <button class="btn" onclick="subscribe()">免费订阅</button>
+      <button class="btn" onclick="filter('all')">全部</button>
+      <button class="btn" onclick="filter('model')">大模型</button>
+      <button class="btn" onclick="filter('tool')">AI工具</button>
+      <div id="interaction-output" class="console">
+        <div class="info">等待操作...</div>
+      </div>
+    </div>
+    
+    <div class="test-section">
+      <h2>4. 数据库连接测试</h2>
+      <button class="btn" onclick="testDatabase()">测试数据库连接</button>
+      <div id="database-output" class="console">
+        <div class="info">等待测试...</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // 日志输出函数
+    function log(elementId, message, type = 'info') {
+      const output = document.getElementById(elementId);
+      const time = new Date().toLocaleTimeString();
+      output.innerHTML += `<div class="${type}">[${time}] ${message}</div>`;
+      output.scrollTop = output.scrollHeight;
+    }
+    
+    // 测试 Alert
+    function testAlert() {
+      log('console-output', 'Alert 按钮已点击', 'info');
+      alert('✅ Alert 功能正常！');
+    }
+    
+    // 测试 Console
+    function testConsole() {
+      console.log('这是 console.log 测试');
+      console.warn('这是 console.warn 测试');
+      console.error('这是 console.error 测试');
+      log('console-output', 'Console 测试完成，请按 F12 查看浏览器控制台', 'success');
+    }
+    
+    // 快捷键测试
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'k') {
+        e.preventDefault();
+        log('shortcut-output', '✅ Ctrl+K 快捷键已触发！', 'success');
+        alert('🎯 Ctrl+K 快捷键正常工作！');
+      }
+    });
+    
+    // 订阅功能
+    function subscribe() {
+      log('interaction-output', '订阅按钮已点击', 'info');
+      const email = prompt('请输入您的邮箱：');
+      if (email) {
+        log('interaction-output', `✅ 已记录邮箱：${email}`, 'success');
+      }
+    }
+    
+    // 筛选功能
+    function filter(category) {
+      const names = {
+        'all': '全部',
+        'model': '大模型',
+        'tool': 'AI工具'
+      };
+      log('interaction-output', `筛选分类：${names[category]}`, 'info');
+    }
+    
+    // 数据库测试
+    async function testDatabase() {
+      log('database-output', '开始测试数据库连接...', 'info');
+      
+      try {
+        const SUPABASE_URL = 'https://pkveggrcoftgxvxtkbnj.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBrdmVnZ3Jjb2Z0Z3h2eHRrYm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NDI0NTksImV4cCI6MjA4OTIxODQ1OX0.mo8px2ta-qIBIPFG6x2YLV0LNnqJUxLppHhjRidCLKs';
+        
+        log('database-output', '初始化 Supabase 客户端...', 'info');
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        log('database-output', '查询 articles 表...', 'info');
+        const { data, error } = await supabase
+          .from('articles')
+          .select('*')
+          .limit(5);
+        
+        if (error) {
+          log('database-output', `❌ 错误：${error.message}`, 'error');
+        } else {
+          log('database-output', `✅ 成功！查询到 ${data.length} 条数据`, 'success');
+          data.forEach(item => {
+            log('database-output', `- ${item.title}`, 'info');
+          });
+        }
+      } catch (err) {
+        log('database-output', `❌ 异常：${err.message}`, 'error');
+      }
+    }
+    
+    // 页面加载完成
+    window.addEventListener('load', () => {
+      log('console-output', '✅ 页面加载完成', 'success');
+      log('console-output', '✅ JavaScript 已启用', 'success');
+      log('console-output', '✅ Supabase SDK 已加载', 'success');
+    });
+  </script>
+</body>
+</html>

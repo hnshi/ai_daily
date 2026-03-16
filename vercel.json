@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/send-daily-email",
+      "schedule": "0 8 * * *"
+    }
+  ],
+  "env": {
+    "RESEND_API_KEY": "@resend-api-key",
+    "RESEND_FROM_EMAIL": "AI Daily <onboarding@resend.dev>",
+    "NEXT_PUBLIC_SUPABASE_URL": "https://hnshi.github.io/ai-daily",
+    "SUPABASE_SERVICE_ROLE_KEY": "@supabase-service-role-key",
+    "WEBSITE_URL": "https://ai-daily.vercel.app",
+    "CRON_SECRET": "@cron-secret"
+  }
+}

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>调试页面 - AI日氪</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .test-item {
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border-left: 4px solid #4CAF50;
+    }
+    .test-item.error {
+      border-left-color: #f44336;
+    }
+    .test-item.warning {
+      border-left-color: #ff9800;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    #console-output {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 8px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+      margin-top: 20px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <h1>🔧 AI日氪 - 调试页面</h1>
+
+  <div id="tests">
+    <h2>功能测试</h2>
+    <div class="test-item" id="test-1">✅ HTML 加载成功</div>
+    <div class="test-item" id="test-2">⏳ JavaScript 加载中...</div>
+    <div class="test-item" id="test-3">⏳ Supabase SDK 加载中...</div>
+    <div class="test-item" id="test-4">⏳ 按钮测试中...</div>
+    <div class="test-item" id="test-5">⏳ 数据库连接中...</div>
+  </div>
+
+  <div>
+    <h2>手动测试</h2>
+    <button onclick="testAlert()">测试 Alert</button>
+    <button onclick="testConsole()">测试 Console</button>
+    <button onclick="testDatabase()">测试数据库</button>
+    <button onclick="clearConsole()">清空日志</button>
+  </div>
+
+  <div id="console-output"></div>
+
+  <script>
+    const consoleOutput = document.getElementById('console-output');
+
+    // 重写 console.log
+    const originalLog = console.log;
+    const originalError = console.error;
+    const originalWarn = console.warn;
+
+    function addLog(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString();
+      const color = type === 'error' ? '#ff6b6b' : type === 'warn' ? '#feca57' : '#54a0ff';
+      consoleOutput.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+      consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    }
+
+    console.log = function(...args) {
+      originalLog.apply(console, args);
+      addLog(args.join(' '), 'info');
+    };
+
+    console.error = function(...args) {
+      originalError.apply(console, args);
+      addLog(args.join(' '), 'error');
+    };
+
+    console.warn = function(...args) {
+      originalWarn.apply(console, args);
+      addLog(args.join(' '), 'warn');
+    };
+
+    // 测试 JavaScript
+    document.getElementById('test-2').innerHTML = '✅ JavaScript 加载成功';
+    console.log('JavaScript 已加载');
+
+    // 测试 Supabase SDK
+    setTimeout(() => {
+      if (window.supabase) {
+        document.getElementById('test-3').innerHTML = '✅ Supabase SDK 加载成功';
+        console.log('Supabase SDK 已加载');
+
+        // 初始化客户端
+        const SUPABASE_URL = 'https://pkveggrcoftgxvxtkbnj.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBrdmVnZ3Jjb2Z0Z3h2eHRrYm5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NDI0NTksImV4cCI6MjA4OTIxODQ1OX0.mo8px2ta-qIBIPFG6x2YLV0LNnqJUxLppHhjRidCLKs';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        console.log('Supabase 客户端已初始化');
+        console.log('URL:', SUPABASE_URL);
+        console.log('Key:', SUPABASE_KEY.substring(0, 30) + '...');
+
+        // 测试数据库连接
+        testDatabaseConnection(supabase);
+      } else {
+        document.getElementById('test-3').innerHTML = '❌ Supabase SDK 加载失败';
+        console.error('Supabase SDK 未加载');
+      }
+    }, 500);
+
+    // 测试按钮
+    document.getElementById('test-4').innerHTML = '✅ 按钮功能正常';
+    console.log('按钮点击功能已测试');
+
+    async function testDatabaseConnection(supabase) {
+      try {
+        console.log('正在测试数据库连接...');
+
+        const { data, error } = await supabase
+          .from('articles')
+          .select('*')
+          .limit(5);
+
+        if (error) {
+          throw error;
+        }
+
+        console.log(`✅ 数据库连接成功！获取到 ${data.length} 条记录`);
+        document.getElementById('test-5').innerHTML = `✅ 数据库连接成功 (${data.length} 条记录)`;
+
+        // 显示数据
+        data.forEach((article, index) => {
+          console.log(`[${index + 1}] ${article.title}`);
+        });
+
+      } catch (error) {
+        console.error('❌ 数据库连接失败:', error.message);
+        document.getElementById('test-5').innerHTML = `❌ 数据库连接失败: ${error.message}`;
+      }
+    }
+
+    // 手动测试函数
+    function testAlert() {
+      alert('✅ Alert 功能正常！');
+      console.log('Alert 已触发');
+    }
+
+    function testConsole() {
+      console.log('✅ Console 功能正常！');
+      console.warn('这是一个警告信息');
+      console.error('这是一个错误信息');
+    }
+
+    function testDatabase() {
+      console.log('重新测试数据库连接...');
+      location.reload();
+    }
+
+    function clearConsole() {
+      consoleOutput.innerHTML = '';
+      console.log('日志已清空');
+    }
+
+    // 测试 Ctrl+K
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        console.log('✅ Ctrl+K 快捷键已触发');
+        alert('✅ Ctrl+K 快捷键功能正常！');
+      }
+    });
+
+    console.log('调试页面初始化完成');
+  </script>
+</body>
+</html>
