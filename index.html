@@ -494,10 +494,12 @@
         <div class="article-full-text" id="articleContent"></div>
       </div>
       <div class="article-modal-footer">
-        <a href="#" target="_blank" class="article-source-link" id="articleLink">
-          <span>阅读原文</span>
-          <span>↗</span>
-        </a>
+        <div id="articleLinkContainer">
+          <a href="#" target="_blank" class="article-source-link" id="articleLink">
+            <span>阅读原文</span>
+            <span>↗</span>
+          </a>
+        </div>
         <button class="btn-primary" onclick="document.getElementById('articleModal').classList.remove('show')">
           关闭
         </button>
@@ -562,7 +564,7 @@
             categoryName: getCategoryName(item.category),
             source: item.source,
             time: formatTimeAgo(item.published_at),
-            url: item.url || '#article-' + item.id
+            url: item.url || null // 如果没有 url，设为 null
           }));
           
           console.log('✅ 已加载 ' + newsData.length + ' 条资讯');
@@ -660,11 +662,6 @@
         }
       }
       
-      // 打开文章详情
-      function openArticle(id) {
-        showToast('文章详情功能开发中...', 'info');
-      }
-      
       // ===== 文章详情功能 =====
       const articleModal = document.getElementById('articleModal');
       const closeArticleBtn = document.getElementById('closeArticleBtn');
@@ -682,7 +679,21 @@
         document.getElementById('articleTime').textContent = article.time;
         document.getElementById('articleSource').textContent = article.source;
         document.getElementById('articleContent').innerHTML = generateArticleContent(article);
-        document.getElementById('articleLink').href = article.url;
+        
+        // 处理阅读原文链接
+        const articleLinkContainer = document.getElementById('articleLinkContainer');
+        const articleLink = document.getElementById('articleLink');
+        
+        if (article.url && article.url !== '#') {
+          articleLink.href = article.url;
+          articleLinkContainer.style.display = 'block';
+        } else {
+          // 如果没有 url，生成一个搜索链接
+          const searchUrl = 'https://www.google.com/search?q=' + encodeURIComponent(article.title);
+          articleLink.href = searchUrl;
+          articleLink.innerHTML = '<span>在 Google 搜索</span><span>↗</span>';
+          articleLinkContainer.style.display = 'block';
+        }
         
         // 显示详情页
         articleModal.classList.add('show');
